@@ -10,6 +10,10 @@ public class TreeObject {
 		}
 	}
 	
+	TreeObject(long key){
+		this.key = key;
+	}
+	
 	public long getKey() {
 		return key;
 	}
