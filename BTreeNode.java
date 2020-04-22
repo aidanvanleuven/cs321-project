@@ -11,13 +11,15 @@ public class BTreeNode {
 	public TreeObject key[];
 	public boolean leaf;
 	public BTreeNode children[];
+	public BTreeNode parent;
 	
-	BTreeNode(int order, boolean leaf){
+	BTreeNode(int order, boolean leaf, BTreeNode parent){
 		n = 0;
 		this.order = order;
 		this.key = new TreeObject[order - 1];
 		this.leaf = leaf;
 		this.children = new BTreeNode[order];
+		this.parent = parent;
 	}
 	
 }
