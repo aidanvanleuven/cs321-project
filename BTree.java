@@ -23,11 +23,15 @@ public class BTree {
 	}
 	
 	/*
-	 * The return type isn't super clear in the slides
-	 * so I just put void for now but it will return
-	 * something
+	 * 
+	 * @param x - BTreeNode 
+	 * @param k - long value whose value we are searching for matching element for
+	 * @return - int value count the frequency of the value in the tree
 	 */
-	public void search(BTreeNode x, long k){
+	 public int search(BTreeNode x, long k)
+	{
+		int i = 1;
+		
 		
 	}
 	

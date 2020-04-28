@@ -13,6 +13,8 @@ public class BTreeNode {
 	public BTreeNode children[];
 	public BTreeNode parent;
 	
+	
+	//What is the value of n in the BTreeNode?? Is it the number of objects? 
 	BTreeNode(int order, boolean leaf, BTreeNode parent){
 		n = 0;
 		this.order = order;
