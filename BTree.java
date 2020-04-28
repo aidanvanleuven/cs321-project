@@ -74,11 +74,7 @@ public class BTree {
 	public void deleteKey(long k, BTreeNode x) {
 		
 	}
-	
-	public void removeKey(long k, BTreeNode x) {
 		
-	}
-	
 	public void mergeNodes(BTreeNode x, BTreeNode y) {
 		
 	}
