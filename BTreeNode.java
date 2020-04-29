@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.Serializable;
 
 public class BTreeNode implements Serializable{
@@ -17,7 +18,6 @@ public class BTreeNode implements Serializable{
 	public TreeObject key[];
 	public boolean leaf;
 	public BTreeNode children[];
-	String path;
 	public BTreeNode parent;
 	
 	
@@ -25,18 +25,10 @@ public class BTreeNode implements Serializable{
 	BTreeNode(int order, boolean leaf, BTreeNode parent){
 		n = 0;
 		this.order = order;
-		this.key = new TreeObject[order - 1];
+		this.key = new TreeObject[order];
 		this.leaf = leaf;
 		this.children = new BTreeNode[order];
 		this.parent = parent;
-	}
-	
-	public void setChildPaths() {
-		if(!leaf) {
-			for(int i = 0; i < (n + 1); i++) {
-				children[i].path = path + "/" + i;
-			}
-		}
 	}
 	
 }
