@@ -16,6 +16,10 @@ public class TreeObject implements Serializable {
 		}
 	}
 	
+	TreeObject(long key){
+		this.key = key;
+	}
+	
 	public long getKey() {
 		return key;
 	}

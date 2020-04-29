@@ -18,13 +18,17 @@ public class BTreeNode implements Serializable{
 	public boolean leaf;
 	public BTreeNode children[];
 	String path;
+	public BTreeNode parent;
 	
-	BTreeNode(int order, boolean leaf){
+	
+	//What is the value of n in the BTreeNode?? Is it the number of objects? 
+	BTreeNode(int order, boolean leaf, BTreeNode parent){
 		n = 0;
 		this.order = order;
 		this.key = new TreeObject[order - 1];
 		this.leaf = leaf;
 		this.children = new BTreeNode[order];
+		this.parent = parent;
 	}
 	
 	public void setChildPaths() {
