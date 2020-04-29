@@ -1,5 +1,11 @@
+import java.io.Serializable;
 
-public class BTreeNode {
+public class BTreeNode implements Serializable{
+	
+	/**
+	 * Required by the interface
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	/*
 	 * In the pseudocode in the slides, these values are accessed
@@ -11,6 +17,7 @@ public class BTreeNode {
 	public TreeObject key[];
 	public boolean leaf;
 	public BTreeNode children[];
+	String path;
 	
 	BTreeNode(int order, boolean leaf){
 		n = 0;
@@ -18,6 +25,14 @@ public class BTreeNode {
 		this.key = new TreeObject[order - 1];
 		this.leaf = leaf;
 		this.children = new BTreeNode[order];
+	}
+	
+	public void setChildPaths() {
+		if(!leaf) {
+			for(int i = 0; i < (n + 1); i++) {
+				children[i].path = path + "/" + i;
+			}
+		}
 	}
 	
 }

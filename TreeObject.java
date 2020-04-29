@@ -1,5 +1,11 @@
+import java.io.Serializable;
 
-public class TreeObject {
+public class TreeObject implements Serializable {
+	
+	/**
+	 * Required by the interface
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private long key;
 	
