@@ -18,7 +18,7 @@ public class BTree {
 	private String name;
 	private Cache<BTreeNode> currentNodes;
 	
-	BTree(int order, String treeName, int sequenceLength){
+	BTree(int order){
 		this.order = order;
 		this.degree = order/2;
 		this.name = treeName + ".btree.data." + sequenceLength + "." + degree;
@@ -132,8 +132,25 @@ public class BTree {
 	 public int search(BTreeNode x, long k)
 	{
 		int i = 1;
-		
-		return 0;
+		//This loop isnt complete I need the second half of the psuedocode for the
+		//condition
+		while( i <= x.getNumbObjects() && k < x.key[i].getKey())
+		{
+			i++;
+		}
+		if(i <= x.getNumbObjects() && k == x.key[i].getKey())
+		{
+			return x.key[i].getFrequency();
+		}
+		else if(x.leaf)
+		{
+			return -1;
+		}
+		else
+		{
+			//Disk read method (x.children[i])
+			return search(x.children[i], k);
+		}
 	}
 	
 	public void splitChild(BTreeNode x, int i) {
@@ -168,7 +185,7 @@ public class BTree {
 		return 0;
 	}
 	
-	
+	//Is this the same as the split method??
 	public void moveKey(long k, BTreeNode from, BTreeNode to) {
 		
 	}
@@ -180,7 +197,11 @@ public class BTree {
 	public void deleteKey(long k, BTreeNode x) {
 		
 	}
+	
+	public void removeKey(long k, BTreeNode x) {
 		
+	}
+	
 	public void mergeNodes(BTreeNode x, BTreeNode y) {
 		
 	}
