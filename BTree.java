@@ -25,7 +25,7 @@ public class BTree {
 	private ObjectOutputStream os;
 	private ZipOutputStream zs;
 	
-	BTree(int order, String treeName, int sequenceLength){
+	BTree(int order){
 		this.order = order;
 		this.degree = order/2;
 		this.name = treeName + ".btree.data." + sequenceLength + "." + degree;
@@ -72,8 +72,25 @@ public class BTree {
 	 public int search(BTreeNode x, long k)
 	{
 		int i = 1;
-		
-		return 0;
+		//This loop isnt complete I need the second half of the psuedocode for the
+		//condition
+		while( i <= x.getNumbObjects() && k < x.key[i].getKey())
+		{
+			i++;
+		}
+		if(i <= x.getNumbObjects() && k == x.key[i].getKey())
+		{
+			return x.key[i].getFrequency();
+		}
+		else if(x.leaf)
+		{
+			return -1;
+		}
+		else
+		{
+			//Disk read method (x.children[i])
+			return search(x.children[i], k);
+		}
 	}
 	
 	public void splitChild(BTreeNode x, int i) {
@@ -108,20 +125,26 @@ public class BTree {
 		return 0;
 	}
 	
-	
+	//Is this the same as the split method??
 	public void moveKey(long k, BTreeNode from, BTreeNode to) {
 		
 	}
 	
 	/*
-	 * These two functions might be the same, but they
-	 * were both listed in the slides...
+	 * @param k is element to be removed from the node
+	 * @param x is the node itself
+	 * @author NathanJones
 	 */
 	public void deleteKey(long k, BTreeNode x) {
-		
+		//
 	}
-		
+	
 	public void mergeNodes(BTreeNode x, BTreeNode y) {
+		//check and handle overfill situation
+		if(x.n+y.n>=x.order) {
+			//i'm assuming that we are to move the 
+		}
+		//perform the merge
 		
 	}
 
