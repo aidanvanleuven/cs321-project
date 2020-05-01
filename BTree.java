@@ -68,14 +68,25 @@ public class BTree {
 	}
 	
 	/*
-	 * These two functions might be the same, but they
-	 * were both listed in the slides...
+	 * @param k is element to be removed from the node
+	 * @param x is the node itself
+	 * @author NathanJones
 	 */
 	public void deleteKey(long k, BTreeNode x) {
-		
+		//
 	}
-		
+	
+	/*
+	 * @param x is the first node to be merged
+	 * @param y is the second node to be merged 
+	 * @author NathanJones
+	 */
 	public void mergeNodes(BTreeNode x, BTreeNode y) {
+		//check and handle overfill situation
+		if(x.n+y.n>=x.order) {
+			//i'm assuming that we are to move the 
+		}
+		//perform the merge
 		
 	}
 
