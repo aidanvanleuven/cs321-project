@@ -1,11 +1,6 @@
 import java.io.Serializable;
 
-public class TreeObject implements Serializable {
-	
-	/**
-	 * Required by the interface
-	 */
-	private static final long serialVersionUID = 1L;
+public class TreeObject {
 	
 	private long key;
 	private int frequency;

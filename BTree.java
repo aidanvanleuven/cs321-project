@@ -1,126 +1,66 @@
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 
 public class BTree {
 	
-	private ZipFile myFile;
+	public ZipFile myFile;
 	private BTreeNode root;
 	private int order;
 	private int degree;
 	private String name;
 	private Cache<BTreeNode> currentNodes;
+	private ObjectOutputStream os;
+	private ZipOutputStream zs;
 	
 	BTree(int order, String treeName, int sequenceLength){
 		this.order = order;
 		this.degree = order/2;
 		this.name = treeName + ".btree.data." + sequenceLength + "." + degree;
-		this.root = new BTreeNode(order,true,null);
+		this.root = new BTreeNode(order,true,0);
 		this.currentNodes = new Cache<BTreeNode>(15);
 		try {
+
 			myFile = new ZipFile(name);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		initializeDisk();
-		writeTreeMetaData();
 		diskWrite(root);
+		writeTreeMetaData();
 	}
 
 
 	public void diskWrite(BTreeNode node){
-		try {
-			String path;
-			if(node == root) {
-				path = "/n";
-			}
-			else{
-				path = diskSearch(node.key[1].getKey());
-			}
-			FileOutputStream fs = new FileOutputStream(name);
-			ZipOutputStream zs = new ZipOutputStream(fs);
-			ObjectOutputStream os = new ObjectOutputStream(zs);
-			ZipEntry current = myFile.getEntry(path);
-			if(current == null) {
-				current = new ZipEntry(path);
-			}
-			zs.putNextEntry(current);
-			//need to write data to node
-			os.writeObject(node);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
-	public String diskSearch(long key) {
-		String path = "/";
-		
-		
-		return path;
-	}
-	
-	private void initializeDisk() {
-		
-		try {
-			FileOutputStream fs;
-			fs = new FileOutputStream(name);
-			ZipOutputStream zs = new ZipOutputStream(fs);
-			ZipEntry r = new ZipEntry("/");
-			ZipEntry treeMeta = new ZipEntry("/tree");
-			ZipEntry n = new ZipEntry("/n");
-			zs.putNextEntry(r);
-			zs.putNextEntry(treeMeta);
-			zs.putNextEntry(n);
-			zs.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	private void writeTreeMetaData() {
-		try {
-			FileOutputStream fs = new FileOutputStream(name);
-			ZipOutputStream zs = new ZipOutputStream(fs);
-			ZipEntry current = myFile.getEntry("/tree");
-			if(current == null) {
-				//need to make node
-			}
-			zs.putNextEntry(current);
-			//need to write data to node
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		
 	}
 	
 
-	/*
-	 * It looks like this is suppose to work on the child of
-	 * a node... Slide 39 on lecture15
-	 */
-	public void diskRead(BTreeNode xc) {
+
+	
+	private void writeTreeMetaData() {
+
 		
+	}
+	
+
+
+	public BTreeNode diskRead(int offset) {
+		BTreeNode node =  null;
+		
+		return node;
 	}
 	
 	/*
