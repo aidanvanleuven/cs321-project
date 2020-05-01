@@ -1,7 +1,14 @@
+import java.io.Serializable;
 
-public class TreeObject {
+public class TreeObject implements Serializable {
+	
+	/**
+	 * Required by the interface
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private long key;
+	private int frequency;
 	
 	TreeObject(String sequence){
 		key = convertCharToNum(sequence.charAt(0));
@@ -11,7 +18,18 @@ public class TreeObject {
 	}
 	
 	TreeObject(long key){
+		this.frequency = 1;
 		this.key = key;
+	}
+	
+	public int getFrequency()
+	{
+		return frequency;
+	}
+	
+	public void increaseFrequency()
+	{
+		this.frequency++;
 	}
 	
 	public long getKey() {
