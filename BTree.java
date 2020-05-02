@@ -229,6 +229,61 @@ public class BTree {
 	
 		return 0;
 	}
+
+	/**
+	* Searches the BTree starting at the supplied offset and returns the corresponding BTreeNode
+	*
+	* @param k the key to be searched for
+	* @param offset the offset of the node where the search will be started
+	* @return The BTreeNode containing the key, null if not found
+	*/
+	private BTreeNode diskSearch(long k, int offset){
+		BTreeNode node = diskRead(offset);
+
+		if (node.key[0].getKey() > k){
+			return diskSearch(k, node.children[0]);
+
+		} else if (node.key[node.numObjects - 1].getKey() < k){
+			return diskSearch(k, node.children[node.numObjects - 1]);
+
+		} else {
+			for (int i = 0; i < node.numObjects - 1; i++){
+				if (k == node.key[i].getKey()){
+					return node;
+				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey()){
+					return diskRead(node.children[i + 1]);
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	* Searches the BTree starting at the root and returns the corresponding BTreeNode
+	*
+	* @param k the key to be searched for
+	* @return The BTreeNode containing the key, null if not found
+	*/
+	private BTreeNode diskSearch(long k){
+		BTreeNode node = diskRead(rootOffset);
+
+		if (node.key[0].getKey() > k){
+			return diskSearch(k, node.children[0]);
+
+		} else if (node.key[node.numObjects - 1].getKey() < k){
+			return diskSearch(k, node.children[node.numObjects - 1]);
+
+		} else {
+			for (int i = 0; i < node.numObjects - 1; i++){
+				if (k == node.key[i].getKey()){
+					return node;
+				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey()){
+					return diskRead(node.children[i + 1]);
+				}
+			}
+		}
+		return null;
+	}
 	
 	//Is this the same as the split method??
 	public void moveKey(long k, BTreeNode from, BTreeNode to) {
