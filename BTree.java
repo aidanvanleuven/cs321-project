@@ -212,12 +212,21 @@ public class BTree {
 	
 	public BTreeNode precedingChild(long key) {
 		BTreeNode node = diskSearch(key);
-		return diskRead(node.children[0]);
+		if (!node.leaf){
+			return diskRead(node.children[0]); 
+		} else {
+			return null;
+		}
 	}
 	
 	public BTreeNode successorChild(long key) {
 		BTreeNode node = diskSearch(key);
-		return diskRead(node.children[node.numChildren - 1]);
+		if (!node.leaf){
+			return diskRead(node.children[node.numChildren - 1]);
+		} else {
+			return null;
+		}
+		
 	}
 	
 	public long findPredecessorKey(long k, BTreeNode x) {
