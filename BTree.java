@@ -210,6 +210,12 @@ public class BTree {
 		
 	}
 	
+	/**
+	* Returns the predecessor child of the provided key
+	*
+	* @param key the key of which the predecessor child will be returned
+	* @return the preceeding child node of the given key
+	*/
 	public BTreeNode precedingChild(long key) {
 		BTreeNode node = diskSearch(key);
 		if (node == null || node.leaf){
@@ -230,6 +236,12 @@ public class BTree {
 		}
 	}
 	
+	/**
+	* Returns the successor child of the provided key
+	*
+	* @param key the key of which the successor child will be returned
+	* @return the proceeding child node of the given key
+	*/
 	public BTreeNode successorChild(long key) {
 		BTreeNode node = diskSearch(key);
 		if (node == null || node.leaf){
@@ -251,14 +263,74 @@ public class BTree {
 		
 	}
 	
+	/**
+	* Returns the predecessor of the provided key in the provided node
+	*
+	* @param k the key of which the predecessor will be returned
+	* @param x the node in which k is stored
+	* @return the preceding key, 0 if not found or invalid
+	*/
 	public long findPredecessorKey(long k, BTreeNode x) {
-		
-		return 0;
+		int i = 0;
+		Boolean found = false;
+
+		while (i < x.numObjects){
+			if (k == x.key[i].getKey()){
+				found = true;
+				break;
+			}
+			i++;
+		}
+
+		if (found){
+			if (x.leaf){
+				if (i - 1 >= 0){
+					return x.key[i - 1].getKey();
+				} else {
+					return 0;
+				}
+			} else {
+				BTreeNode result = diskRead(x.children[i]);
+				return result.key[result.numObjects - 1].getKey();
+			}
+		} else {
+			return 0;
+		}
 	}
 
+	/**
+	* Returns the successor of the provided key in the provided node
+	*
+	* @param k the key of which the successor will be returned
+	* @param x the node in which k is stored
+	* @return the proceeding key, 0 if not found or invalid
+	*/
 	public long findSuccessorKey(long k, BTreeNode x) {
-	
-		return 0;
+		int i = 0;
+		Boolean found = false;
+
+		while (i < x.numObjects){
+			if (k == x.key[i].getKey()){
+				found = true;
+				break;
+			}
+			i++;
+		}
+
+		if (found){
+			if (x.leaf){
+				if (i + 1 == x.numObjects){
+					return 0;
+				} else {
+					return x.key[i + 1].getKey();
+				}
+			} else {
+				BTreeNode result = diskRead(x.children[i + 1]);
+				return result.key[0].getKey();
+			}
+		} else {
+			return 0;
+		}
 	}
 
 	/**
