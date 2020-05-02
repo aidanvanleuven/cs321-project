@@ -22,6 +22,10 @@ public class TreeObject {
 		return frequency;
 	}
 	
+	public void setFrequency(int i) {
+		frequency = i;
+	}
+	
 	public void increaseFrequency()
 	{
 		this.frequency++;

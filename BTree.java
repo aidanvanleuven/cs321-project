@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.Enumeration;
@@ -16,51 +17,155 @@ import java.util.zip.ZipOutputStream;
 
 public class BTree {
 	
-	public ZipFile myFile;
 	private BTreeNode root;
 	private int order;
 	private int degree;
-	private String name;
+	private RandomAccessFile raf;
+	private File f;
+	private int rootOffset;
+	private int nodeSize;
+	private int nextInsert;
 	private Cache<BTreeNode> currentNodes;
-	private ObjectOutputStream os;
-	private ZipOutputStream zs;
-	
-	BTree(int order){
-		this.order = order;
-		this.degree = order/2;
-		this.name = treeName + ".btree.data." + sequenceLength + "." + degree;
-		this.root = new BTreeNode(order,true,0);
-		this.currentNodes = new Cache<BTreeNode>(15);
-		try {
 
-			myFile = new ZipFile(name);
+	
+	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize){
+		//This if statement will determine the optimal degree for a disk size of
+		//		4096 if there is no degree specified
+		//TODO possibly need to double check my logic
+		if(degree == 0) {
+			this.degree = 4099/32;
+		}
+		else {
+			this.degree = degree;
+		}
+		this.order = degree*2;
+		
+		//Build the name of the file we are writing to
+		String name = fileName + ".btree.data." + sequenceLength + "." + degree;
+		
+		//This was found by adding up the number of bytes for all of the data that belongs to a node
+			this.nodeSize = 4 + 1 + 4 + 12 * (order - 1) + 4 * order;
+		
+		//This is offset by the number of bytes the tree metaData is(3 integers)
+		this.rootOffset = 4 + 4 + 4;
+		
+		//This will be where to insert a new node
+		this.nextInsert = rootOffset + nodeSize;
+		
+		if(cache) {
+			currentNodes = new Cache<BTreeNode>(cacheSize);
+		}
+		
+		BTreeNode r = new BTreeNode(order, true, 0);
+		root = r;
+		r.setOffset(rootOffset);
+		
+		try {
+			f = new File(name);
+			f.delete();
+			f.createNewFile();
+			raf = new RandomAccessFile(f, "rw");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		diskWrite(root);
 		writeTreeMetaData();
 	}
+	
+	
 
 
 	public void diskWrite(BTreeNode node){
+		try {
+			raf.seek(node.offset);
+			raf.writeInt(node.offset);
+			raf.writeInt(node.parent);
+			raf.writeInt(node.numObjects);
+			raf.writeBoolean(node.leaf);
+			for(int i = 0; i < order; i++) {
+				//Write child
+				if(!node.leaf && i < (node.numObjects + 1)) {
+					//Write all the children that are in the node
+					raf.writeInt(node.children[i]);
+				}
+				else{
+					//There are no more children so write 0
+					raf.writeInt(0);
+				}
+				//write TreeObject
+				if(i < node.numObjects) {
+					raf.writeLong(node.key[i].getKey());
+					raf.writeInt(node.key[i].getFrequency());
+				}
+				else{
+					raf.writeLong(0);
+					raf.writeInt(0);
+				}
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		
 	}
 	
-
-
-	
-	private void writeTreeMetaData() {
-
-		
-	}
-	
-
-
 	public BTreeNode diskRead(int offset) {
 		BTreeNode node =  null;
+		//TODO need to implement a method in the cache class to tell whether something was in there or not
+		if(currentNodes != null) {
+			node = currentNodes.contains(offset);
+			if(node != null) {
+				return node;
+			}
+		}
+		
+		try {
+			raf.seek(offset);
+			node = new BTreeNode(0,false,0);
+			node.offset = raf.readInt();
+			node.parent = raf.readInt();
+			node.numObjects = raf.readInt();
+			node.leaf = raf.readBoolean();
+			for(int i = 0; i < order; i++) {
+				//read child
+				node.children[i]=raf.readInt();
+				//read TreeObject
+				long k = raf.readLong();
+				int freq = raf.readInt();
+				TreeObject t = new TreeObject(k);
+				t.setFrequency(freq);
+				node.key[i] = t;
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		currentNodes.addObject(node);
 		
 		return node;
+	}
+	
+	public void writeTreeMetaData() {
+		try {
+			raf.seek(0);
+			raf.writeInt(degree);
+			raf.writeInt(rootOffset);
+			raf.writeInt(nodeSize);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void readTreeMetaData() {
+		try {
+			raf.seek(0);
+			degree = raf.readInt();
+			rootOffset = raf.readInt();
+			nodeSize = raf.readInt();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/*

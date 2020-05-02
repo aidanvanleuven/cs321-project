@@ -9,23 +9,25 @@ public class BTreeNode{
 	 * that
 	*/
 	public int numObjects;
-	public int order;
 	public TreeObject key[];  //we might need to rename this
 	public boolean leaf;
 	public int children[];
 	public int parent;
+	public int offset;
 	
 	
 	//What is the value of n in the BTreeNode?? Is it the number of objects? 
 	BTreeNode(int order, boolean leaf, int parent){
 		this.numObjects = 0;
-		this.order = order;
 		this.key = new TreeObject[order];
 		this.leaf = leaf;
 		this.children = new int[order];
 		this.parent = parent;
 	}
 	
+	public void setOffset(int i) {
+		this.offset = i;
+	}
 	
 	//might not need this
 	public int getNumbObjects()
