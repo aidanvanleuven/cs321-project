@@ -212,8 +212,19 @@ public class BTree {
 	
 	public BTreeNode precedingChild(long key) {
 		BTreeNode node = diskSearch(key);
-		if (!node.leaf){
-			return diskRead(node.children[0]); 
+		if (node == null || node.leaf){
+			return null;
+		}
+		int i = 0;
+		while (i < node.numObjects){
+			if (key == node.key[i].getKey()){
+				break;
+			}
+			i++;
+		}
+		BTreeNode result = diskRead(node.children[i]);
+		if (result != null){
+			return result;
 		} else {
 			return null;
 		}
@@ -221,8 +232,19 @@ public class BTree {
 	
 	public BTreeNode successorChild(long key) {
 		BTreeNode node = diskSearch(key);
-		if (!node.leaf){
-			return diskRead(node.children[node.numChildren - 1]);
+		if (node == null || node.leaf){
+			return null;
+		}
+		int i = 0;
+		while (i < node.numObjects){
+			if (key == node.key[i].getKey()){
+				break;
+			}
+			i++;
+		}
+		BTreeNode result = diskRead(node.children[i + 1]);
+		if (result != null){
+			return result;
 		} else {
 			return null;
 		}
