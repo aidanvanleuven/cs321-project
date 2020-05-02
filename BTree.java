@@ -211,13 +211,13 @@ public class BTree {
 	}
 	
 	public BTreeNode precedingChild(long key) {
-		
-		return null;
+		BTreeNode node = diskSearch(key);
+		return diskRead(node.children[0]);
 	}
 	
 	public BTreeNode successorChild(long key) {
-		
-		return null;
+		BTreeNode node = diskSearch(key);
+		return diskRead(node.children[node.numChildren - 1]);
 	}
 	
 	public long findPredecessorKey(long k, BTreeNode x) {
@@ -244,13 +244,13 @@ public class BTree {
 			return diskSearch(k, node.children[0]);
 
 		} else if (node.key[node.numObjects - 1].getKey() < k){
-			return diskSearch(k, node.children[node.numObjects - 1]);
+			return diskSearch(k, node.children[node.numChildren - 1]);
 
 		} else {
 			for (int i = 0; i < node.numObjects - 1; i++){
 				if (k == node.key[i].getKey()){
 					return node;
-				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey()){
+				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey() && !node.leaf){
 					return diskSearch(k, node.children[i + 1]);
 				}
 			}
@@ -271,13 +271,13 @@ public class BTree {
 			return diskSearch(k, node.children[0]);
 
 		} else if (node.key[node.numObjects - 1].getKey() < k){
-			return diskSearch(k, node.children[node.numObjects - 1]);
+			return diskSearch(k, node.children[node.numChildren - 1]);
 
 		} else {
 			for (int i = 0; i < node.numObjects - 1; i++){
 				if (k == node.key[i].getKey()){
 					return node;
-				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey()){
+				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey() && !node.leaf){
 					return diskSearch(k, node.children[i + 1]);
 				}
 			}

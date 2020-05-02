@@ -14,11 +14,13 @@ public class BTreeNode{
 	public int children[];
 	public int parent;
 	public int offset;
+	public int numChildren; //experimental
 	
 	
 	//What is the value of n in the BTreeNode?? Is it the number of objects? 
 	BTreeNode(int order, boolean leaf, int parent){
 		this.numObjects = 0;
+		this.numChildren = 0;
 		this.key = new TreeObject[order];
 		this.leaf = leaf;
 		this.children = new int[order];
