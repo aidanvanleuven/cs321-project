@@ -251,7 +251,7 @@ public class BTree {
 				if (k == node.key[i].getKey()){
 					return node;
 				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey()){
-					return diskRead(node.children[i + 1]);
+					return diskSearch(k, node.children[i + 1]);
 				}
 			}
 		}
@@ -278,7 +278,7 @@ public class BTree {
 				if (k == node.key[i].getKey()){
 					return node;
 				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey()){
-					return diskRead(node.children[i + 1]);
+					return diskSearch(k, node.children[i + 1]);
 				}
 			}
 		}
