@@ -39,5 +39,15 @@ public class BTreeNode{
 	{
 		this.numObjects = x;
 	}
+
+	//Returns keys of the node
+	@Override
+	public String toString(){
+		String result = "";
+		for (int i = 0; i < key.length; i++){
+			result += key[i] + " ";
+		}
+		return result;
+	}
 	
 }
