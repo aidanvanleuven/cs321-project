@@ -177,8 +177,7 @@ public class BTree {
 	 public int search(BTreeNode x, long k)
 	{
 		int i = 1;
-		//This loop isnt complete I need the second half of the psuedocode for the
-		//condition
+
 		while( i <= x.getNumbObjects() && k < x.key[i].getKey())
 		{
 			i++;
@@ -193,8 +192,8 @@ public class BTree {
 		}
 		else
 		{
-			//Disk read method (x.children[i])
-			return search(x.children[i], k);
+			BTreeNode next = diskRead(x.children[i]);
+			return search(next, k);
 		}
 	}
 	
