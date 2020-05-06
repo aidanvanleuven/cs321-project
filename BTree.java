@@ -393,12 +393,12 @@ public class BTree {
 	}
 	
 	/*
+	 * This method was deemed unessential to this particular
+	 * project and so has not yet been implemented
 	 * @param k is element to be removed from the node
 	 * @param x is the node itself
-	 * @author NathanJones
 	 */
 	public void deleteKey(long k, BTreeNode x) {
-		//
 	}
 	
 	public void mergeNodes(BTreeNode x, BTreeNode y) {
