@@ -27,7 +27,13 @@ public class Cache <K,V>{
      * @return the object associated with the key value or null if not found
     **/
     public V getObject(K key){
-        return cache.get(key);
+        V result = cache.get(key);
+        if (result != null){
+            cache.remove(key);
+            return cache.put(key, result);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -39,7 +45,8 @@ public class Cache <K,V>{
     public V addObject(V object, K key){
         V find = cache.get(key);
         if (find != null){
-            return find;
+            cache.remove(key);
+            return cache.put(key, object);
         } else {
             if (cache.size() >= size){
                 cache.remove(cache.entrySet().iterator().next().getKey());
