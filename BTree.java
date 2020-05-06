@@ -111,7 +111,7 @@ public class BTree {
 	
 	public BTreeNode diskRead(int offset) {
 		BTreeNode node =  null;
-		//TODO need to implement a method in the cache class to tell whether something was in there or not
+		
 		if(currentNodes != null) {
 			node = currentNodes.getObject(offset);
 			if(node != null) {
@@ -168,7 +168,7 @@ public class BTree {
 		}
 	}
 	
-	/*
+	/**
 	 * 
 	 * @param x - BTreeNode 
 	 * @param k - long value whose value we are searching for matching element for
