@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
 import java.util.Scanner;
@@ -52,12 +53,12 @@ public class GeneBankCreateBTree
             printUsage();
         }
         
-        //GBK file 
+        //GBK file argument
         try
         {
             gbk = new File(args[2]);
         }
-        catch(Exception e)  //Ideally I would like to use the filenotfound execption but its giving me an error, any help would be appreciated. DM
+        catch(NullPointerException e)  //Ideally I would like to use the filenotfound execption but its giving me an error, any help would be appreciated. DM
         {
             System.out.println("File does not exist " + gbk.toPath());
             
@@ -66,12 +67,17 @@ public class GeneBankCreateBTree
         fileName = new File(gbk + ".btree.data." + sequenceLength + "." + degree);
         
         //optional cache size
+        if(args.length>=5)
+        {
+        	size = Integer.parseInt(args[4]);
+        }
         
         //optional debug level
-        if(args.length==5) 
+        if(args.length==6) 
         {
         	debugLevel = Integer.parseInt(args[5]);
         }
+        
         
     }
     
