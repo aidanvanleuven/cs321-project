@@ -3,17 +3,21 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
 import java.util.Scanner;
-
+/*
+ * This class is invoked and creates 
+ * @author davidMarcial nathanJones
+ */
 public class GeneBankCreateBTree
 {
     public static BTree tree;
     public static File gbk;
-    public static File file;
+    public static File fileName;
     public static int size = 4096;
     public static int degree = 0;
     public static final int MAX_SEQUENCE_LENGTH = 31;
     public static final int MIN_SEQUENCE_LENGTH = 1;
     public static int sequenceLength = 0;    
+    public static int debugLevel = 0;
     
     public static void main (String args[])
     {
@@ -23,7 +27,9 @@ public class GeneBankCreateBTree
             printUsage();
         }
         
-        
+        /*
+        (args[0]==1) ? code needed for future cache implementation
+         */
         
         if(Integer.parseInt(args[1]) == 0)
         {
@@ -36,13 +42,13 @@ public class GeneBankCreateBTree
         
         int stringLength = Integer.parseInt(args[3]);
         
-        if(stringLength >= MIN_SEQUENCE_LENGTH || stringLength <= MAX_SEQUENCE_LENGTH)
+        if(stringLength >= MIN_SEQUENCE_LENGTH && stringLength <= MAX_SEQUENCE_LENGTH)
         {
             sequenceLength = stringLength;
         }
         else
         {
-            System.out.println("The integer for the sequence length must be between 1 and 31 inclusively");
+            System.out.println("The integer for the sequence length must be between 1 and 31 inclusive");
             printUsage();
         }
         
@@ -57,9 +63,15 @@ public class GeneBankCreateBTree
             
         }
         
-        file = new File(gbk + ".btree.data." + sequenceLength + "." + degree);
+        fileName = new File(gbk + ".btree.data." + sequenceLength + "." + degree);
         
-       
+        //optional cache size
+        
+        //optional debug level
+        if(args.length==5) 
+        {
+        	debugLevel = Integer.parseInt(args[5]);
+        }
         
     }
     

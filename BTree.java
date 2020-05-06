@@ -201,6 +201,12 @@ public class BTree {
 		
 	}
 	
+	/**
+	 * This doc added because this method is used in another class and I just want to make sure
+	 * when it gets implemented they use it in the same sort of way that I did. LMK if what I did
+	 * is stupid
+	 * @param k
+	 */
 	public void insert(long k) {
 		
 	}
