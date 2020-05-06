@@ -25,7 +25,7 @@ public class BTree {
 	private int rootOffset;
 	private int nodeSize;
 	private int nextInsert;
-	private Cache<BTreeNode> currentNodes;
+	private Cache<Integer, BTreeNode> currentNodes;
 
 	
 	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize){
@@ -53,7 +53,7 @@ public class BTree {
 		this.nextInsert = rootOffset + nodeSize;
 		
 		if(cache) {
-			currentNodes = new Cache<BTreeNode>(cacheSize);
+			currentNodes = new Cache<Integer, BTreeNode>(cacheSize);
 		}
 		
 		BTreeNode r = new BTreeNode(order, true, 0);
@@ -113,7 +113,7 @@ public class BTree {
 		BTreeNode node =  null;
 		//TODO need to implement a method in the cache class to tell whether something was in there or not
 		if(currentNodes != null) {
-			node = currentNodes.contains(offset);
+			node = currentNodes.getObject(offset);
 			if(node != null) {
 				return node;
 			}
@@ -141,7 +141,7 @@ public class BTree {
 			e.printStackTrace();
 		}
 		
-		currentNodes.addObject(node);
+		currentNodes.addObject(node, node.offset);
 		
 		return node;
 	}
