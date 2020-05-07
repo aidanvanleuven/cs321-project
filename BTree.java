@@ -11,6 +11,7 @@ import java.io.RandomAccessFile;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.Enumeration;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -28,7 +29,7 @@ public class BTree {
 	private Cache<Integer, BTreeNode> currentNodes;
 
 	
-	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize){
+	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize, RandomAccessFile raf){
 		//This if statement will determine the optimal degree for a disk size of
 		//		4096 if there is no degree specified
 		//TODO possibly need to double check my logic
@@ -59,6 +60,8 @@ public class BTree {
 		BTreeNode r = new BTreeNode(order, true, 0);
 		root = r;
 		r.setOffset(rootOffset);
+		
+		this.raf = raf;
 		
 		try {
 			f = new File(name);
@@ -205,13 +208,14 @@ public class BTree {
 			return search(next, k);
 		}
 	}
+<<<<<<< HEAD
 	/**
 	 * The parent node should be non-full.
 	 * 
 	 * @param parent
 	 * @param i
 	 */
-	public void splitChild(BTreeNode parent, int i) {
+	public void splitNode(BTreeNode parent, int i) {
 		BTreeNode origChild = diskRead(parent.children[i]);
 		BTreeNode newChild = new BTreeNode(order,parent.leaf,origChild.offset);
 		newChild.offset = nextInsert;
@@ -266,7 +270,7 @@ public class BTree {
 			//newNode.children[0] = r; //need to make r the child of newNode here
 			r.setOffset(nextInsert);
 			newNode.setOffset(0);
-			splitChild(newNode, 0);
+			splitNode(newNode, 0);
 			insertNonfull(newNode, k);
 		} else {
 			insertNonfull(r, k);
@@ -274,7 +278,33 @@ public class BTree {
 	}
 	
 	public void insertNonfull(BTreeNode x, long k) {
-		
+		int d = this.degree;	
+		int numKeys = x.getNumbObjects();
+
+		if (x.isLeaf()) {
+			while(numKeys >= 1 && k < x.key[numKeys-1].getKey()) {
+				x.key[numKeys].copy(x.key[numKeys - 1]);
+				x.key[numKeys - 1].empty();
+				numKeys--;
+			}
+
+			x.key[numKeys].setKey(k);
+			x.key[numKeys].setFrequency(1);
+			x.setNumObjects(x.getNumbObjects() + 1);
+			diskWrite(x);
+		} else {
+			while(numKeys >= 1 && k < x.key[numKeys-1].getKey()) {
+				numKeys--;
+			}
+			BTreeNode y = diskRead(x.children[numKeys]);
+			if (y.key.length == order - 1) {
+				splitNode(x, numKeys);
+				if (k > x.key[numKeys - 1].getKey()) {
+					numKeys++;
+				}
+			}
+			insertNonfull(diskRead(x.children[numKeys]), k);
+		}
 	}
 	
 	/**

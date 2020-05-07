@@ -1,3 +1,4 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,9 +20,13 @@ public class GeneBankCreateBTree
     public static final int MIN_SEQUENCE_LENGTH = 1;
     public static int sequenceLength = 0;    
     public static int debugLevel = 0;
-    
+    public static boolean cache;
+    public static int cacheSize = 0;
     public static void main (String args[])
     {
+        try
+        {
+        
         if (args.length < 4 || args.length > 6)
         {
             System.out.println("Incorrect number of arguments! Please use the following usage.");
@@ -64,8 +69,67 @@ public class GeneBankCreateBTree
             
         }
         
-        fileName = new File(gbk + ".btree.data." + sequenceLength + "." + degree);
+        //fileName = new File(gbk + ".btree.data." + sequenceLength + "." + degree);
+        String fileName = (args[2]);
         
+        cache = false;
+        
+        
+        RandomAccessFile randomAccess = new RandomAccessFile(fileName, "rw");
+        tree = new BTree(degree,fileName,sequenceLength,cache, cacheSize, randomAccess);
+        TreeObject object;
+        
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader currentInput = new BufferedReader(new FileReader(gbk));
+        String currentLine;
+        boolean start = false;
+        
+        while((currentLine = currentInput.readLine()) != null)
+        {
+            Scanner lineScan = new Scanner(currentInput);
+            String line = currentLine.replaceAll("\\s", "");
+            String line1 = line.replaceAll("\\d", ""); 
+            
+            if(line1.equals("ORIGIN"))
+            {
+                start = true;
+            }
+            
+            if(start == true)
+            {
+                for(int i = 0; i < line1.length(); i++)
+                {
+                    char character = line1.charAt(i);
+                    
+                    if (character == 'n' || character == 'N')
+                    {
+                        stringBuilder = new StringBuilder();
+                    }
+                    else if(character == 'A' || character == 'T' || character == 'C' || character == 'G')
+                    {
+                        stringBuilder.append(Character.toLowerCase(character));
+                    }
+                    
+                    if(sequenceLength == stringBuilder.length())
+                    {
+                    long key = TreeObject.convertCharToNum(character);
+                    object = new TreeObject(key);
+                    tree.insert(key);
+                    }                   
+                }  
+            }   
+            lineScan.close();     
+        }
+    }
+        catch(FileNotFoundException e)
+        {
+            System.out.println("File not found");
+        }
+    
+        catch(IOException b)
+        {
+        
+        }      
         //optional cache size
         if(args.length>=5)
         {
@@ -78,11 +142,7 @@ public class GeneBankCreateBTree
         	debugLevel = Integer.parseInt(args[5]);
         }
         
-        
-    }
-    
-    
-    
+    } 
     
     public static void printUsage()
     {

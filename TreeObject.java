@@ -12,8 +12,14 @@ public class TreeObject {
 		}
 	}
 	
-	TreeObject(long key){
+	public TreeObject(long key){
 		this.frequency = 1;
+		this.key = key;
+	}
+	
+	public TreeObject(long key, int frequency)
+	{
+		this.frequency = frequency;
 		this.key = key;
 	}
 	
@@ -29,6 +35,16 @@ public class TreeObject {
 	public void increaseFrequency()
 	{
 		this.frequency++;
+	}
+	
+	public void copy(TreeObject newValues) {
+		this.key = newValues.key;
+		this.frequency = newValues.frequency;
+	}
+
+	public void empty() {
+		this.key = 0;
+		this.frequency = 0;
 	}
 	
 	public long getKey() {
