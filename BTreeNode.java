@@ -43,13 +43,23 @@ public class BTreeNode{
 	public boolean isLeaf() {
 		return leaf;
 	}
+	
+	public void updateLeaf() {
+		for(int i:children) {
+			if(i != 0) {
+				leaf = false;
+				return;
+			}
+		}
+		leaf = true;
+	}
 
 	//Returns keys of the node
 	@Override
 	public String toString(){
 		String result = "";
-		for (int i = 0; i < key.length; i++){
-			result += key[i] + " ";
+		for (int i = 0; i < key.length && key[i] != null; i++){
+			result += key[i].getKey() + " ";
 		}
 		return result;
 	}

@@ -75,8 +75,7 @@ public class GeneBankCreateBTree
         cache = false;
         
         
-        RandomAccessFile randomAccess = new RandomAccessFile(fileName, "rw");
-        tree = new BTree(degree,fileName,sequenceLength,cache, cacheSize, randomAccess);
+        tree = new BTree(degree,fileName,sequenceLength,cache, cacheSize);
         TreeObject object;
         
         StringBuilder stringBuilder = new StringBuilder();

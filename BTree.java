@@ -1,19 +1,8 @@
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-import java.util.Enumeration;
 import java.util.Random;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 
 public class BTree {
@@ -25,11 +14,11 @@ public class BTree {
 	private File f;
 	private int rootOffset;
 	private int nodeSize;
-	private int nextInsert;
+	private int nextOffset;
 	private Cache<Integer, BTreeNode> currentNodes;
 
 	
-	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize, RandomAccessFile raf){
+	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize){
 		//This if statement will determine the optimal degree for a disk size of
 		//		4096 if there is no degree specified
 		//TODO possibly need to double check my logic
@@ -45,13 +34,13 @@ public class BTree {
 		String name = fileName + ".btree.data." + sequenceLength + "." + degree;
 		
 		//This was found by adding up the number of bytes for all of the data that belongs to a node
-			this.nodeSize = 4 + 1 + 4 + 12 * (order - 1) + 4 * order;
+			this.nodeSize = 4 + 1 + 4 + 12 * (order) + 4 * order;
 		
 		//This is offset by the number of bytes the tree metaData is(3 integers)
 		this.rootOffset = 4 + 4 + 4;
 		
 		//This will be where to insert a new node
-		this.nextInsert = rootOffset + nodeSize;
+		this.nextOffset = rootOffset + nodeSize;
 		
 		if(cache) {
 			currentNodes = new Cache<Integer, BTreeNode>(cacheSize);
@@ -60,9 +49,7 @@ public class BTree {
 		BTreeNode r = new BTreeNode(order, true, 0);
 		root = r;
 		r.setOffset(rootOffset);
-		
-		this.raf = raf;
-		
+				
 		try {
 			f = new File(name);
 			f.delete();
@@ -72,6 +59,7 @@ public class BTree {
 			e.printStackTrace();
 		}
 		writeTreeMetaData();
+		diskWrite(root);
 	}
 	
 	BTree(File f){
@@ -80,7 +68,6 @@ public class BTree {
 			readTreeMetaData();
 			root = diskRead(rootOffset);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -133,14 +120,18 @@ public class BTree {
 		
 		try {
 			raf.seek(offset);
-			node = new BTreeNode(0,false,0);
-			node.offset = raf.readInt();
-			node.parent = raf.readInt();
-			node.numObjects = raf.readInt();
+			node = new BTreeNode(order,false,0);
+			int o = raf.readInt();
+			node.offset = o;
+			int p = raf.readInt();
+			node.parent = p;
+			int nO = raf.readInt();
+			node.numObjects = nO;
 			node.leaf = raf.readBoolean();
 			for(int i = 0; i < order; i++) {
 				//read child
-				node.children[i]=raf.readInt();
+				int c = raf.readInt();
+				node.children[i]=c;
 				//read TreeObject
 				long k = raf.readLong();
 				int freq = raf.readInt();
@@ -153,7 +144,9 @@ public class BTree {
 			e.printStackTrace();
 		}
 		
-		currentNodes.addObject(node, node.offset);
+		if(currentNodes != null) {
+			currentNodes.addObject(node, node.offset);
+		}
 		
 		return node;
 	}
@@ -173,6 +166,7 @@ public class BTree {
 		try {
 			raf.seek(0);
 			degree = raf.readInt();
+			order = 2*degree;
 			rootOffset = raf.readInt();
 			nodeSize = raf.readInt();
 		} catch (IOException e) {
@@ -210,17 +204,17 @@ public class BTree {
 	}
 
 	/**
-	 * The parent node should be non-full.
-	 * 
+	 *  
 	 * @param parent
 	 * @param i
 	 */
 	public void splitNode(BTreeNode parent, int i) {
 		BTreeNode origChild = diskRead(parent.children[i]);
-		BTreeNode newChild = new BTreeNode(order,parent.leaf,origChild.offset);
-		newChild.offset = nextInsert;
+		BTreeNode newChild = new BTreeNode(order,origChild.leaf,parent.offset);
+		newChild.setOffset(nextOffset);
+		nextOffset += nodeSize;
 		for(int j = 0; j < degree - 1; j++) {
-			newChild.key[j] = origChild.key[degree + 1 + j];
+			newChild.key[j] = origChild.key[degree + j];
 			newChild.numObjects++;
 			origChild.numObjects--;
 		}
@@ -239,11 +233,13 @@ public class BTree {
 		for(int j = parent.numObjects; j > i; j--) {
 			parent.key[j] = parent.key[j - 1];
 		}
-		parent.key[i] = origChild.key[degree];
+		parent.key[i] = origChild.key[degree - 1];
 		parent.numObjects++;
-		diskWrite(origChild);
+		origChild.numObjects--;
 		diskWrite(parent);
+		diskWrite(origChild);
 		diskWrite(newChild);
+		printTree();
 	}
 	
 	/**
@@ -264,14 +260,17 @@ public class BTree {
 		BTreeNode r = this.root;
 
 		if (r.numObjects == 2 * degree - 1) {
-			BTreeNode newNode = new BTreeNode(0, false, 0);
-			this.root = newNode;
-			newNode.setNumObjects(0);
-			//newNode.children[0] = r; //need to make r the child of newNode here
-			r.setOffset(nextInsert);
-			newNode.setOffset(0);
-			splitNode(newNode, 0);
-			insertNonfull(newNode, k);
+			BTreeNode newRoot = new BTreeNode(order, false, 0);
+			this.root = newRoot;
+			newRoot.setOffset(rootOffset);
+			r.setOffset(nextOffset);
+			nextOffset += nodeSize;
+			r.parent = rootOffset;
+			r.updateLeaf();
+			newRoot.children[0] = r.offset; //need to make r the child of newNode here
+			diskWrite(r);
+			splitNode(newRoot, 0);
+			insertNonfull(newRoot, k);
 		} else {
 			insertNonfull(r, k);
 		}
@@ -282,14 +281,14 @@ public class BTree {
 		int numKeys = x.getNumbObjects();
 
 		if (x.isLeaf()) {
+			x.key[numKeys] = new TreeObject(0,0);
 			while(numKeys >= 1 && k < x.key[numKeys-1].getKey()) {
 				x.key[numKeys].copy(x.key[numKeys - 1]);
 				x.key[numKeys - 1].empty();
 				numKeys--;
 			}
-
-			x.key[numKeys].setKey(k);
-			x.key[numKeys].setFrequency(1);
+			TreeObject t = new TreeObject(k,1);
+			x.key[numKeys] = t;
 			x.setNumObjects(x.getNumbObjects() + 1);
 			diskWrite(x);
 		} else {
@@ -468,11 +467,19 @@ public class BTree {
 		BTreeNode node = diskRead(rootOffset);
 
 		if (node.key[0].getKey() > k){
-			return diskSearch(k, node.children[0]);
-
-		} else if (node.key[node.numObjects - 1].getKey() < k){
-			return diskSearch(k, node.children[node.numChildren - 1]);
-
+			if(!node.leaf) {
+				return diskSearch(k, node.children[0]);
+			}
+			else {
+				return null;
+			}
+		} else if (node.numObjects!= 0 && node.key[node.numObjects - 1].getKey() < k){
+			if(!node.leaf) {
+				return diskSearch(k, node.children[node.numChildren - 1]);
+			}
+			else {
+				return null;
+			}
 		} else {
 			for (int i = 0; i < node.numObjects - 1; i++){
 				if (k == node.key[i].getKey()){
@@ -483,6 +490,22 @@ public class BTree {
 			}
 		}
 		return null;
+	}
+	
+	public void printTree() {
+		printTreeRecursive(root, "root");
+	}
+	
+	private void printTreeRecursive(BTreeNode n, String path) {
+		System.out.println("Path,offset: " + path + "," + n.offset + " -> " + n.toString());
+		if(!n.leaf) {
+			for(int i = 0; i <= n.numObjects; i++) {
+				if(n.children[i] != 0) {
+				BTreeNode nn = diskRead(n.children[i]);
+				printTreeRecursive(nn,path + "/" + i);
+				}
+			}
+		}
 	}
 	
 	//Is this the same as the split method??
@@ -501,9 +524,9 @@ public class BTree {
 	
 	public void mergeNodes(BTreeNode x, BTreeNode y) {
 		//check and handle overfill situation
-		if(x.n+y.n>=x.order) {
+		//if(x.n+y.n>=x.order) {
 			//i'm assuming that we are to move the 
-		}
+		//}
 		//perform the merge
 		
 	}

@@ -38,8 +38,8 @@ public class TreeObject {
 	}
 	
 	public void copy(TreeObject newValues) {
-		this.key = newValues.key;
-		this.frequency = newValues.frequency;
+		this.key = newValues.getKey();
+		this.frequency = newValues.getFrequency();
 	}
 
 	public void empty() {
