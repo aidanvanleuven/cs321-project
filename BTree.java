@@ -208,7 +208,7 @@ public class BTree {
 			return search(next, k);
 		}
 	}
-<<<<<<< HEAD
+
 	/**
 	 * The parent node should be non-full.
 	 * 
