@@ -39,6 +39,10 @@ public class BTreeNode{
 	{
 		this.numObjects = x;
 	}
+	
+	public boolean isLeaf() {
+		return leaf;
+	}
 
 	//Returns keys of the node
 	@Override
