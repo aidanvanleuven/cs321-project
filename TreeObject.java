@@ -51,6 +51,11 @@ public class TreeObject {
 		return key;
 	}
 	
+	public void setKey(long k)
+	{
+		this.key = k;
+	}
+	
 	public static int convertCharToNum(char c) {
 		c = Character.toLowerCase(c);
 		int result;
