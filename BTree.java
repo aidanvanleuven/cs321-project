@@ -71,7 +71,16 @@ public class BTree {
 		writeTreeMetaData();
 	}
 	
-	
+	BTree(File f){
+		try {
+			raf = new RandomAccessFile(f, "r");
+			readTreeMetaData();
+			root = diskRead(rootOffset);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 
 	public void diskWrite(BTreeNode node){
@@ -196,9 +205,41 @@ public class BTree {
 			return search(next, k);
 		}
 	}
-	
-	public void splitChild(BTreeNode x, int i) {
-		
+	/**
+	 * The parent node should be non-full.
+	 * 
+	 * @param parent
+	 * @param i
+	 */
+	public void splitChild(BTreeNode parent, int i) {
+		BTreeNode origChild = diskRead(parent.children[i]);
+		BTreeNode newChild = new BTreeNode(order,parent.leaf,origChild.offset);
+		newChild.offset = nextInsert;
+		for(int j = 0; j < degree - 1; j++) {
+			newChild.key[j] = origChild.key[degree + 1 + j];
+			newChild.numObjects++;
+			origChild.numObjects--;
+		}
+		if(!origChild.leaf) {
+			for(int j = 0; j < degree; j++) {
+				newChild.key[j] = origChild.key[degree + j];
+				newChild.numChildren++;
+				origChild.numChildren--;
+			}
+		}
+		for(int j = parent.numObjects; j > i; j--) {
+			parent.children[j + 1] = parent.children[j];
+		}
+		parent.children[i+1] = newChild.offset;
+		parent.numChildren++;
+		for(int j = parent.numObjects; j > i; j--) {
+			parent.key[j] = parent.key[j - 1];
+		}
+		parent.key[i] = origChild.key[degree];
+		parent.numObjects++;
+		diskWrite(origChild);
+		diskWrite(parent);
+		diskWrite(newChild);
 	}
 	
 	/**
@@ -225,7 +266,7 @@ public class BTree {
 			//newNode.children[0] = r; //need to make r the child of newNode here
 			r.setOffset(nextInsert);
 			newNode.setOffset(0);
-			splitNode(newNode, 0);
+			splitChild(newNode, 0);
 			insertNonfull(newNode, k);
 		} else {
 			insertNonfull(r, k);
