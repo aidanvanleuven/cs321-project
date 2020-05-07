@@ -197,7 +197,7 @@ public class BTree {
 		}
 	}
 	
-	public void splitChild(BTreeNode x, int i) {
+	public void splitNode(BTreeNode x, int i) {
 		
 	}
 	
@@ -233,7 +233,33 @@ public class BTree {
 	}
 	
 	public void insertNonfull(BTreeNode x, long k) {
-		
+		int d = this.degree;	
+		int numKeys = x.getNumbObjects();
+
+		if (x.isLeaf()) {
+			while(numKeys >= 1 && k < x.key[numKeys-1].getKey()) {
+				x.key[numKeys].copy(x.key[numKeys - 1]);
+				x.key[numKeys - 1].empty();
+				numKeys--;
+			}
+
+			x.key[numKeys].setKey(k);
+			x.key[numKeys].setFrequency(1);
+			x.setNumObjects(x.getNumbObjects() + 1);
+			diskWrite(x);
+		} else {
+			while(numKeys >= 1 && k < x.key[numKeys-1].getKey()) {
+				numKeys--;
+			}
+			BTreeNode y = diskRead(x.children[numKeys]);
+			if (y.key.length == order - 1) {
+				splitNode(x, numKeys);
+				if (k > x.key[numKeys - 1].getKey()) {
+					numKeys++;
+				}
+			}
+			insertNonfull(diskRead(x.children[numKeys]), k);
+		}
 	}
 	
 	/**
