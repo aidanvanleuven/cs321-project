@@ -11,6 +11,7 @@ import java.io.RandomAccessFile;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.Enumeration;
+import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -28,7 +29,7 @@ public class BTree {
 	private Cache<Integer, BTreeNode> currentNodes;
 
 	
-	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize){
+	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize, RandomAccessFile raf){
 		//This if statement will determine the optimal degree for a disk size of
 		//		4096 if there is no degree specified
 		//TODO possibly need to double check my logic
@@ -59,6 +60,8 @@ public class BTree {
 		BTreeNode r = new BTreeNode(order, true, 0);
 		root = r;
 		r.setOffset(rootOffset);
+		
+		this.raf = raf;
 		
 		try {
 			f = new File(name);
