@@ -208,7 +208,28 @@ public class BTree {
 	 * @param k
 	 */
 	public void insert(long k) {
-		
+		BTreeNode duplicate = diskSearch(k);
+
+		if (duplicate != null) {
+			duplicate.key[0].increaseFrequency();
+			diskWrite(duplicate);
+			return;
+		}
+
+		BTreeNode r = this.root;
+
+		if (r.numObjects == 2 * degree - 1) {
+			BTreeNode newNode = new BTreeNode(0, false, 0);
+			this.root = newNode;
+			newNode.setNumObjects(0);
+			//newNode.children[0] = r; //need to make r the child of newNode here
+			r.setOffset(nextInsert);
+			newNode.setOffset(0);
+			splitNode(newNode, 0);
+			insertNonfull(newNode, k);
+		} else {
+			insertNonfull(r, k);
+		}
 	}
 	
 	public void insertNonfull(BTreeNode x, long k) {
