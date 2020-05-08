@@ -58,7 +58,7 @@ public class BTreeNode{
 	@Override
 	public String toString(){
 		String result = "";
-		for (int i = 0; i < key.length && key[i] != null; i++){
+		for (int i = 0; i < numObjects && key[i] != null; i++){
 			result += key[i].getKey() + " ";
 		}
 		return result;

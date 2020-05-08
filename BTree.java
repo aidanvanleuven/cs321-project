@@ -34,7 +34,7 @@ public class BTree {
 		String name = fileName + ".btree.data." + sequenceLength + "." + degree;
 		
 		//This was found by adding up the number of bytes for all of the data that belongs to a node
-			this.nodeSize = 4 + 1 + 4 + 12 * (order) + 4 * order;
+			this.nodeSize = 4 + 4 + 4 + 1 + 12 * (order) + 4 * order;
 		
 		//This is offset by the number of bytes the tree metaData is(3 integers)
 		this.rootOffset = 4 + 4 + 4;
@@ -127,6 +127,7 @@ public class BTree {
 			node.parent = p;
 			int nO = raf.readInt();
 			node.numObjects = nO;
+			node.numChildren = node.numObjects + 1;
 			node.leaf = raf.readBoolean();
 			for(int i = 0; i < order; i++) {
 				//read child
@@ -220,7 +221,7 @@ public class BTree {
 		}
 		if(!origChild.leaf) {
 			for(int j = 0; j < degree; j++) {
-				newChild.key[j] = origChild.key[degree + j];
+				newChild.children[j] = origChild.children[degree + j];
 				newChild.numChildren++;
 				origChild.numChildren--;
 			}
@@ -239,7 +240,6 @@ public class BTree {
 		diskWrite(parent);
 		diskWrite(origChild);
 		diskWrite(newChild);
-		printTree();
 	}
 	
 	/**
@@ -252,7 +252,12 @@ public class BTree {
 		BTreeNode duplicate = diskSearch(k);
 
 		if (duplicate != null) {
-			duplicate.key[0].increaseFrequency();
+			int i = 0;
+			for(;i < order;i++) {
+				if(duplicate.key[i].getKey() == k)
+					break;
+			}
+			duplicate.key[i].increaseFrequency();
 			diskWrite(duplicate);
 			return;
 		}
@@ -268,6 +273,7 @@ public class BTree {
 			r.parent = rootOffset;
 			r.updateLeaf();
 			newRoot.children[0] = r.offset; //need to make r the child of newNode here
+			newRoot.numChildren++;
 			diskWrite(r);
 			splitNode(newRoot, 0);
 			insertNonfull(newRoot, k);
@@ -296,9 +302,9 @@ public class BTree {
 				numKeys--;
 			}
 			BTreeNode y = diskRead(x.children[numKeys]);
-			if (y.key.length == order - 1) {
+			if (y.numObjects == order - 1) {
 				splitNode(x, numKeys);
-				if (k > x.key[numKeys - 1].getKey()) {
+				if (k > x.key[numKeys].getKey()) {
 					numKeys++;
 				}
 			}
@@ -440,13 +446,21 @@ public class BTree {
 		BTreeNode node = diskRead(offset);
 
 		if (node.key[0].getKey() > k){
-			return diskSearch(k, node.children[0]);
-
+			if(!node.leaf) {
+				return diskSearch(k, node.children[0]);
+			}
+			else {
+				return null;
+			}
 		} else if (node.key[node.numObjects - 1].getKey() < k){
-			return diskSearch(k, node.children[node.numChildren - 1]);
-
+			if(!node.leaf) {
+				return diskSearch(k, node.children[node.numChildren - 1]);
+			}
+			else {
+				return null;
+			}
 		} else {
-			for (int i = 0; i < node.numObjects - 1; i++){
+			for (int i = 0; i < node.numObjects; i++){
 				if (k == node.key[i].getKey()){
 					return node;
 				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey() && !node.leaf){
