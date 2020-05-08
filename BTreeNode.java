@@ -53,13 +53,21 @@ public class BTreeNode{
 		}
 		leaf = true;
 	}
+	
+	public void fillKeys() {
+		for(int i = 0; i < key.length; i++) {
+			if(key[i] == null) {
+				key[i] = new TreeObject(0,0);
+			}
+		}
+	}
 
 	//Returns keys of the node
 	@Override
 	public String toString(){
 		String result = "";
 		for (int i = 0; i < numObjects && key[i] != null; i++){
-			result += key[i].getKey() + " ";
+			result += key[i].toString() + " ";
 		}
 		return result;
 	}

@@ -21,7 +21,6 @@ public class BTree {
 	BTree(int degree, String fileName, int sequenceLength, boolean cache, int cacheSize){
 		//This if statement will determine the optimal degree for a disk size of
 		//		4096 if there is no degree specified
-		//TODO possibly need to double check my logic
 		if(degree == 0) {
 			this.degree = 4099/32;
 		}
@@ -49,6 +48,7 @@ public class BTree {
 		BTreeNode r = new BTreeNode(order, true, 0);
 		root = r;
 		r.setOffset(rootOffset);
+		root.fillKeys();
 				
 		try {
 			f = new File(name);
@@ -62,11 +62,14 @@ public class BTree {
 		diskWrite(root);
 	}
 	
-	BTree(File f){
+	BTree(File f, boolean cache, int cacheSize){
 		try {
 			raf = new RandomAccessFile(f, "r");
 			readTreeMetaData();
 			root = diskRead(rootOffset);
+			if(cache) {
+				currentNodes = new Cache<Integer, BTreeNode>(cacheSize);
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -118,6 +121,10 @@ public class BTree {
 			}
 		}
 		
+		if(offset == rootOffset && root != null) {
+			return root;
+		}
+		
 		try {
 			raf.seek(offset);
 			node = new BTreeNode(order,false,0);
@@ -127,8 +134,9 @@ public class BTree {
 			node.parent = p;
 			int nO = raf.readInt();
 			node.numObjects = nO;
-			node.numChildren = node.numObjects + 1;
 			node.leaf = raf.readBoolean();
+			if(!node.leaf)
+				node.numChildren = node.numObjects + 1;
 			for(int i = 0; i < order; i++) {
 				//read child
 				int c = raf.readInt();
@@ -175,6 +183,10 @@ public class BTree {
 		}
 	}
 	
+	public int search(long k) {
+		return search(root, k);
+	}
+	
 	/**
 	 * 
 	 * @param x - BTreeNode 
@@ -183,13 +195,13 @@ public class BTree {
 	 */
 	 public int search(BTreeNode x, long k)
 	{
-		int i = 1;
+		int i = 0;
 
-		while( i <= x.getNumbObjects() && k < x.key[i].getKey())
+		while( i < x.getNumbObjects() && k > x.key[i].getKey())
 		{
 			i++;
 		}
-		if(i <= x.getNumbObjects() && k == x.key[i].getKey())
+		if(i < x.getNumbObjects() && k == x.key[i].getKey())
 		{
 			return x.key[i].getFrequency();
 		}
@@ -253,7 +265,7 @@ public class BTree {
 
 		if (duplicate != null) {
 			int i = 0;
-			for(;i < order;i++) {
+			for(;i < order-1;i++) {
 				if(duplicate.key[i].getKey() == k)
 					break;
 			}
@@ -266,6 +278,7 @@ public class BTree {
 
 		if (r.numObjects == 2 * degree - 1) {
 			BTreeNode newRoot = new BTreeNode(order, false, 0);
+			newRoot.fillKeys();
 			this.root = newRoot;
 			newRoot.setOffset(rootOffset);
 			r.setOffset(nextOffset);
@@ -283,7 +296,6 @@ public class BTree {
 	}
 	
 	public void insertNonfull(BTreeNode x, long k) {
-		int d = this.degree;	
 		int numKeys = x.getNumbObjects();
 
 		if (x.isLeaf()) {
@@ -495,7 +507,7 @@ public class BTree {
 				return null;
 			}
 		} else {
-			for (int i = 0; i < node.numObjects - 1; i++){
+			for (int i = 0; i < node.numObjects; i++){
 				if (k == node.key[i].getKey()){
 					return node;
 				} else if (k > node.key[i].getKey() && k < node.key[i + 1].getKey() && !node.leaf){
