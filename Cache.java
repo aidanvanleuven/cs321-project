@@ -19,7 +19,7 @@ public class Cache <K,V>{
      * @param cacheSize desired size of cache
     **/
     public Cache (int cacheSize){
-        cache = new LinkedHashMap<K,V>((int)(cacheSize / 0.70));
+        cache = new LinkedHashMap<K,V>((int)(cacheSize / 0.74));
         size = cacheSize;
     }
 
@@ -32,33 +32,26 @@ public class Cache <K,V>{
         V result = cache.get(key);
         if (result != null){
             cache.remove(key);
-            return cache.put(key, result);
-        } else {
-            return null;
+            cache.put(key, result);
         }
+        return result;
     }
 
     /**
-     * Adds the object to the cache
+     * Adds the object to the cache, check if key exists before calling
      * @param object the object to add to the cache
      * @param key the key to associate with the object
      * @return the newly cached object, null if size is 0
     **/
     public V addObject(V object, K key){
-        V find = cache.get(key);
-        if (find != null){
-            cache.remove(key);
-            return cache.put(key, object);
-        } else {
-            if (cache.size() >= size){
-                Iterator<Entry<K,V>> it = cache.entrySet().iterator();
-                if (!it.hasNext()){
-                    return null;
-                }
-                cache.remove(it.next().getKey());
+        if (cache.size() >= size){
+            Iterator<Entry<K,V>> it = cache.entrySet().iterator();
+            if (!it.hasNext()){
+                return null;
             }
-            return cache.put(key, object);
+            cache.remove(it.next().getKey());
         }
+        return cache.put(key, object);
     }
 
     /**
@@ -71,7 +64,7 @@ public class Cache <K,V>{
     }
 
     /**
-     * Removes an object from the cache
+     * Replaces an object in the cache
      * @param key the key of the object to modify
      * @param object the object to newly associate with the key
      * @return the newly replaced object or null if not found
