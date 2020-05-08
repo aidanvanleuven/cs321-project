@@ -1,4 +1,6 @@
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 
 /**
  * HashMap implementation of a one level cache.
@@ -40,7 +42,7 @@ public class Cache <K,V>{
      * Adds the object to the cache
      * @param object the object to add to the cache
      * @param key the key to associate with the object
-     * @return the newly cached object
+     * @return the newly cached object, null if size is 0
     **/
     public V addObject(V object, K key){
         V find = cache.get(key);
@@ -49,7 +51,11 @@ public class Cache <K,V>{
             return cache.put(key, object);
         } else {
             if (cache.size() >= size){
-                cache.remove(cache.entrySet().iterator().next().getKey());
+                Iterator<Entry<K,V>> it = cache.entrySet().iterator();
+                if (!it.hasNext()){
+                    return null;
+                }
+                cache.remove(it.next().getKey());
             }
             return cache.put(key, object);
         }
@@ -62,6 +68,16 @@ public class Cache <K,V>{
     **/
     public V removeObject(K key){
         return cache.remove(key);
+    }
+
+    /**
+     * Removes an object from the cache
+     * @param key the key of the object to modify
+     * @param object the object to newly associate with the key
+     * @return the newly replaced object or null if not found
+    **/
+    public V modifyObject(K key, V object){
+        return cache.replace(key, object);
     }
 
     /**

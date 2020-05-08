@@ -1,12 +1,13 @@
 ********************************************************************
-CS321 Data Structures: Final Project
+CS321 Data Structures: Final Project  
 Team Programming Project: Bioinformatics
 
-Team Memebers:
-Aidan Vanleuven
-David Marcial
-Justin Heck
-Mitchell Crocker
+Team Members:
+
+Aidan Vanleuven  
+David Marcial  
+Justin Heck  
+Mitchell Crocker  
 Nathan Jones
 
 

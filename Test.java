@@ -7,7 +7,7 @@ public class Test {
 		String fileName = "tom.gbk";
 		int sequenceLength = 4;
 		boolean cache = true;
-		int cacheSize = 0;
+		int cacheSize = 300;
 		BTree tom = new BTree(degree,fileName,sequenceLength,cache,cacheSize);
 		Random rand = new Random();
 		for(long k = 0; k < 1000; k++) {
