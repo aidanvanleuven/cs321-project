@@ -80,12 +80,12 @@ public class GeneBankCreateBTree
         
         StringBuilder stringBuilder = new StringBuilder();
         BufferedReader currentInput = new BufferedReader(new FileReader(gbk));
-        String currentLine;
+        String currentLine = currentInput.readLine();
         boolean start = false;
-        
-        while((currentLine = currentInput.readLine()) != null)
+     
+        while(currentLine != null)
         {
-            Scanner lineScan = new Scanner(currentInput);
+            Scanner lineScan = new Scanner(currentLine);
             String line = currentLine.replaceAll("\\s", "");
             String line1 = line.replaceAll("\\d", ""); 
             
@@ -107,7 +107,7 @@ public class GeneBankCreateBTree
                     else if(character == 'A' || character == 'T' || character == 'C' || character == 'G')
                     {
                         stringBuilder.append(Character.toLowerCase(character));
-                    }
+                    } 
                     
                     if(sequenceLength == stringBuilder.length())
                     {
@@ -117,7 +117,8 @@ public class GeneBankCreateBTree
                     }                   
                 }  
             }   
-            lineScan.close();     
+            lineScan.close(); 
+            currentLine=currentInput.readLine();
         }
     }
         catch(FileNotFoundException e)
