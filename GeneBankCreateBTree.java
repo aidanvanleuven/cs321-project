@@ -100,27 +100,55 @@ public class GeneBankCreateBTree
         BufferedReader currentInput = new BufferedReader(new FileReader(gbk));
         String currentLine = currentInput.readLine();
         boolean start = false;
+        boolean completeSequence = false;
+        boolean containedSlash = false;
         while(currentLine != null)
         {
+        	
+        	if(start && (currentLine.contains("N") || currentLine.contains("n"))) {
+        		completeSequence = true;
+        	}
             currentLine = currentLine.replaceAll("\\s","").replaceAll("\\d","").replaceAll("[Nn]","");
             
-            if(currentLine.contentEquals("//")) 
+            if(containedSlash) 
             {
-            	start = false;
+            	completeSequence = true;
+            	currentLine.replace("//", "");
+            	containedSlash = true;
             }
             
-            if(start == true && currentLine.length()>0)
+            if(start == true && completeSequence && currentLine.length()>0)
             {
-            	tree.insert(TreeObject.sequenceToLong(currentLine.toLowerCase()));
+            	while(currentLine.length() >= sequenceLength) {
+            		String tmp = currentLine.substring(0, sequenceLength);
+            		tree.insert(TreeObject.sequenceToLong(tmp));
+            		currentLine = currentLine.substring(1);
+            		System.out.println(tmp);
+            	}
+            	completeSequence = false;
+            	if(containedSlash) {
+            		start = false;
+            	}
             	System.out.println(currentLine);
             }   
         
             if(currentLine.equals("ORIGI"))
             {
                 start = true;
+                currentLine = currentInput.readLine();
             }
             
-            currentLine=currentInput.readLine();
+            if(start) {
+            	String curr = currentInput.readLine();
+            	if(curr.contains("//")) {
+            		curr = "";
+            		containedSlash = true;
+            	}
+            	currentLine += curr;
+            }
+            else {
+            	currentLine = currentInput.readLine();
+            }
         }
         currentInput.close();
     }
