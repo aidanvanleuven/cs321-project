@@ -120,6 +120,7 @@ public class GeneBankCreateBTree
             lineScan.close(); 
             currentLine=currentInput.readLine();
         }
+        currentInput.close();
     }
         catch(FileNotFoundException e)
         {
