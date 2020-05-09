@@ -19,7 +19,6 @@ public class GeneBankCreateBTree
     public static final int MAX_SEQUENCE_LENGTH = 31;
     public static final int MIN_SEQUENCE_LENGTH = 1;
     public static int sequenceLength = 0;    
-    public static int debugLevel = 0;
     public static boolean cache;
     public static int cacheSize = 0;
     public static void main (String args[])
@@ -86,14 +85,6 @@ public class GeneBankCreateBTree
         }
         
         /*
-         * TODO optional debug level argument
-         */
-        if(args.length==6) 
-        {
-        	debugLevel = Integer.parseInt(args[5]);
-        }
-               
-        /*
          * Build the tree
          */
         tree = new BTree(degree,fileName,sequenceLength,cache, cacheSize);
@@ -151,6 +142,21 @@ public class GeneBankCreateBTree
             }
         }
         currentInput.close();
+        
+        /*
+         * create dump file if requested
+         */
+        if(args.length==6) 
+        {
+        	if(Integer.parseInt(args[5])==1)
+        	{
+        		File f = new File(fileName + ".btree.dump." + sequenceLength + "." + degree);
+        		RandomAccessFile dump = new RandomAccessFile(f, "rw");
+        		//traverse the tree and append it to the file
+        		
+        		//god speed
+        	}
+        }
     }
         catch(FileNotFoundException e)
         {
