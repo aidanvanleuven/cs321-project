@@ -195,7 +195,7 @@ public class BTree {
 	 */
 	 public int search(BTreeNode x, long k)
 	{
-		int i = 0;
+		int i = 1;
 
 		while( i < x.getNumbObjects() && k > x.key[i].getKey())
 		{
