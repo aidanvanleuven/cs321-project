@@ -34,9 +34,13 @@ public class GeneBankCreateBTree
         }
         
         /*
-        (args[0]==1) ? code needed for future cache implementation
+         *read cache argument and set appropriately
          */
+        cache = (Integer.parseInt(args[0]) == 1) ? true:false;
         
+        /*
+         * read degree argument and set appropriately
+         */
         if(Integer.parseInt(args[1]) == 0)
         {
             degree = (size - 4)/ 32;
@@ -46,8 +50,10 @@ public class GeneBankCreateBTree
             degree = Integer.parseInt(args[1]);
         }
         
+        /*
+         * read and set stringLength argument
+         */
         int stringLength = Integer.parseInt(args[3]);
-        
         if(stringLength >= MIN_SEQUENCE_LENGTH && stringLength <= MAX_SEQUENCE_LENGTH)
         {
             sequenceLength = stringLength;
@@ -58,36 +64,44 @@ public class GeneBankCreateBTree
             printUsage();
         }
         
-        //GBK file argument
+        /*
+         * read and set file argument
+         */
+        String fileName = (args[2]);
         try
         {
-            gbk = new File(args[2]);
+            gbk = new File(fileName);
         }
-        catch(NullPointerException e)  //Ideally I would like to use the filenotfound execption but its giving me an error, any help would be appreciated. DM
+        catch(NullPointerException e)
         {
             System.out.println("File does not exist " + gbk.toPath());
-            
         }
         
-        //fileName = new File(gbk + ".btree.data." + sequenceLength + "." + degree);
-        String fileName = (args[2]);
+        /*
+         * TODO optional cache size argument
+         */
+        if(args.length>=5)
+        {
+        	size = Integer.parseInt(args[4]);
+        }
         
-        cache = false;
-        
-        
+        /*
+         * TODO optional debug level argument
+         */
+        if(args.length==6) 
+        {
+        	debugLevel = Integer.parseInt(args[5]);
+        }
+               
+        /*
+         * Build the tree
+         */
         tree = new BTree(degree,fileName,sequenceLength,cache, cacheSize);
-        //TreeObject object;
-        
-        //StringBuilder stringBuilder = new StringBuilder();
         BufferedReader currentInput = new BufferedReader(new FileReader(gbk));
         String currentLine = currentInput.readLine();
         boolean start = false;
-     
         while(currentLine != null)
         {
-            //Scanner lineScan = new Scanner(currentLine);
-           //String line = currentLine.replaceAll("\\s", "");
-            //line = line.replaceAll("\\d", ""); 
             currentLine = currentLine.replaceAll("\\s","").replaceAll("\\d","");
             
             if(currentLine.equals("ORIGIN"))
@@ -95,31 +109,14 @@ public class GeneBankCreateBTree
                 start = true;
             }
             
+            if(currentLine.contentEquals("//")) {
+            	start = false;
+            }
+            
             if(start == true && currentLine.length()>0)
             {
             	tree.insert(TreeObject.sequenceToLong(currentLine.toLowerCase()));
-            	System.out.println(currentLine.toLowerCase());
-            	/*
-            	for(int i = 0; i < line.length(); i++)
-                {
-                    char character = line.charAt(i);
-                    
-                    if (character == 'n' || character == 'N')
-                    {
-                        stringBuilder = new StringBuilder();
-                    }
-                    else if(character == 'A' || character == 'T' || character == 'C' || character == 'G')
-                    {
-                        stringBuilder.append(Character.toLowerCase(character));
-                    } 
-                    
-                    if(sequenceLength == stringBuilder.length())
-                    {
-                    long key = TreeObject.convertCharToNum(character);
-                    //object = new TreeObject(key);
-                    tree.insert(key);
-                    }                   
-                }*/
+            	System.out.println(currentLine);
             }   
             currentLine=currentInput.readLine();
         }
@@ -134,18 +131,7 @@ public class GeneBankCreateBTree
         {
         
         }      
-        //optional cache size
-        if(args.length>=5)
-        {
-        	size = Integer.parseInt(args[4]);
-        }
-        
-        //optional debug level
-        if(args.length==6) 
-        {
-        	debugLevel = Integer.parseInt(args[5]);
-        }
-        
+
     } 
     
     public static void printUsage()
