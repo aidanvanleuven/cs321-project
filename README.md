@@ -32,9 +32,10 @@ To compile, execute the following command in the main directory:
 $ javac *.java
 
 Run the compiled class file with the command:
-$ java GeneBankCreateBTree <cache> <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]
+$ java GeneBankCreateBTree < cache > <degree> <gbk file> <sequence length> [<cache size>] [<debug level>]
 
 **Please remember to run GeneBankCreateBTree first for a BTree file is needed in order to run GeneBankSearch**
+
 $ java GeneBankSearch <cache> <btree file> <query file> [<cache size>] [<debug leve>]
 
 PROGRAM DESIGN AND IMPORTANT CONCEPTS:
