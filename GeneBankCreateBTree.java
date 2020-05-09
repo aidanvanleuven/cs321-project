@@ -82,7 +82,7 @@ public class GeneBankCreateBTree
          */
         if(args.length>=5)
         {
-        	size = Integer.parseInt(args[4]);
+        	cacheSize = Integer.parseInt(args[4]);
         }
         
         /*
