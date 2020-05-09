@@ -102,7 +102,7 @@ public class GeneBankCreateBTree
         boolean start = false;
         while(currentLine != null)
         {
-            currentLine = currentLine.replaceAll("\\s","").replaceAll("\\d","").replaceAll("/Nn/","");
+            currentLine = currentLine.replaceAll("\\s","").replaceAll("\\d","").replaceAll("[Nn]","");
             
             if(currentLine.contentEquals("//")) 
             {
@@ -114,8 +114,8 @@ public class GeneBankCreateBTree
             	tree.insert(TreeObject.sequenceToLong(currentLine.toLowerCase()));
             	System.out.println(currentLine);
             }   
-            
-            if(currentLine.equals("ORIGIN"))
+        
+            if(currentLine.equals("ORIGI"))
             {
                 start = true;
             }

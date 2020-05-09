@@ -74,7 +74,7 @@ public class TreeObject {
 			break;
 		default:
 			result = -0b10;
-			System.out.println("Invalid character");
+			System.out.println("Invalid character "+ c);
 			break;
 		}
 		return result;
