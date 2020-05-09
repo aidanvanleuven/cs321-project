@@ -122,7 +122,7 @@ public class GeneBankCreateBTree
         {
         	if(Integer.parseInt(args[5])==1)
         	{
-        		File f = new File(fileName + ".btree.data." + sequenceLength + "." + degree);
+        		File f = new File(fileName + ".btree.dump." + sequenceLength + "." + degree);
         		RandomAccessFile dump = new RandomAccessFile(f, "rw");
         		//traverse the tree and append it to the file
         		
