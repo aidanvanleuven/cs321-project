@@ -76,29 +76,33 @@ public class GeneBankCreateBTree
         
         
         tree = new BTree(degree,fileName,sequenceLength,cache, cacheSize);
-        TreeObject object;
+        //TreeObject object;
         
-        StringBuilder stringBuilder = new StringBuilder();
+        //StringBuilder stringBuilder = new StringBuilder();
         BufferedReader currentInput = new BufferedReader(new FileReader(gbk));
         String currentLine = currentInput.readLine();
         boolean start = false;
      
         while(currentLine != null)
         {
-            Scanner lineScan = new Scanner(currentLine);
-            String line = currentLine.replaceAll("\\s", "");
-            String line1 = line.replaceAll("\\d", ""); 
+            //Scanner lineScan = new Scanner(currentLine);
+           //String line = currentLine.replaceAll("\\s", "");
+            //line = line.replaceAll("\\d", ""); 
+            currentLine = currentLine.replaceAll("\\s","").replaceAll("\\d","");
             
-            if(line1.equals("ORIGIN"))
+            if(currentLine.equals("ORIGIN"))
             {
                 start = true;
             }
             
-            if(start == true)
+            if(start == true && currentLine.length()>0)
             {
-                for(int i = 0; i < line1.length(); i++)
+            	tree.insert(TreeObject.sequenceToLong(currentLine.toLowerCase()));
+            	System.out.println(currentLine.toLowerCase());
+            	/*
+            	for(int i = 0; i < line.length(); i++)
                 {
-                    char character = line1.charAt(i);
+                    char character = line.charAt(i);
                     
                     if (character == 'n' || character == 'N')
                     {
@@ -112,12 +116,11 @@ public class GeneBankCreateBTree
                     if(sequenceLength == stringBuilder.length())
                     {
                     long key = TreeObject.convertCharToNum(character);
-                    object = new TreeObject(key);
+                    //object = new TreeObject(key);
                     tree.insert(key);
                     }                   
-                }  
+                }*/
             }   
-            lineScan.close(); 
             currentLine=currentInput.readLine();
         }
         currentInput.close();
